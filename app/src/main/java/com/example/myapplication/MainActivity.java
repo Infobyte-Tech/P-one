@@ -1,11 +1,19 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,6 +24,10 @@ public class MainActivity extends AppCompatActivity {
     private blue_order blueBoxFragment;
     private boolean isRedFragmentOpened = false;
     private boolean isBlueFragmentOpened = false;
+    private TextView countdownDisplay;
+    private CountDownTimer countDownTimer;
+    private ProgressBar circularProgressBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
         fragmentContainer = findViewById(R.id.fragmentContainer);
         redBoxFragment = new red_order();
         blueBoxFragment = new blue_order();
+        countdownDisplay = findViewById(R.id.countdownDisplay);
+        circularProgressBar = findViewById(R.id.circularProgressBar);
+
+
+        startCountdown();
 
         showRedButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,6 +67,56 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void startCountdown() {
+        countDownTimer = new CountDownTimer(180000, 1000) { // 180000 milliseconds = 3 minutes
+            @Override
+            public void onTick(long millisUntilFinished) {
+                // Convert millisUntilFinished to minutes and seconds
+                int minutes = (int) (millisUntilFinished / 1000) / 60;
+                int seconds = (int) (millisUntilFinished / 1000) % 60;
+
+                String timeLeftFormatted = String.format(Locale.getDefault(), "%02d : %02d", minutes, seconds);
+
+                // Update countdownDisplay with the formatted time
+                countdownDisplay.setText(timeLeftFormatted);
+            }
+
+            @Override
+            public void onFinish() {
+                countdownDisplay.setText("03 : 00");
+                showProgressBar();
+                resetActivityAfterDelay();
+            }
+        };
+
+        countDownTimer.start(); // Start the countdown timer
+    }
+
+    private void showProgressBar() {
+        circularProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+    }
+
+    private void resetActivityAfterDelay() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Restart the activity
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+            }
+        }, 3000); // Delay of 3 seconds to show the progress bar (adjust as needed)
+    }
+
 
     private void showRedOrderFragment() {
         getSupportFragmentManager().beginTransaction()
@@ -99,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         if (isRedFragmentOpened) {
             red_order redFragment = (red_order) getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
             if (redFragment != null && redFragment.isVisible()) {
-                getSupportFragmentManager().beginTransaction().remove(redFragment).commit();
+                redFragment.closeFragment();
                 enableHomeScreen();
                 isRedFragmentOpened = false;
                 return;
@@ -109,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
         if (isBlueFragmentOpened) {
             blue_order blueFragment = (blue_order) getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
             if (blueFragment != null && blueFragment.isVisible()) {
-                getSupportFragmentManager().beginTransaction().remove(blueFragment).commit();
+                blueFragment.closeFragment();
                 enableHomeScreen();
                 isBlueFragmentOpened = false;
                 return;
@@ -120,3 +187,5 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+
+
