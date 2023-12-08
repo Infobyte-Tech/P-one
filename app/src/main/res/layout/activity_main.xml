@@ -11,7 +11,10 @@
         android:id="@+id/Top_Layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/rectangular_view_at_top"
         android:gravity="center_horizontal"
         android:orientation="vertical">
@@ -212,6 +215,7 @@
         android:layout_marginBottom="21dp">
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/showBlueButton"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/second_Layout"
@@ -227,6 +231,7 @@
             android:textColor="@android:color/white" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/showRedButton"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/second_Layout"
@@ -290,4 +295,11 @@
             android:paddingVertical="8dp"
             android:src="@drawable/baseline_account_circle_24" />
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
 </RelativeLayout>
