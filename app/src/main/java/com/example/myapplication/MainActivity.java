@@ -8,11 +8,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,8 +30,14 @@ public class MainActivity extends AppCompatActivity {
     private boolean isRedFragmentOpened = false;
     private boolean isBlueFragmentOpened = false;
     private TextView countdownDisplay;
+    private TextView numberofRecord;
     private CountDownTimer countDownTimer;
     private ProgressBar circularProgressBar;
+    private RecyclerView recyclerView;
+    private OrderAdapter orderAdapter;
+    private OrderDbHelper dbHelper;
+    private int currentPage = 0; // Current page index
+    private static final int RECORDS_PER_PAGE = 10;
 
 
     @Override
@@ -41,9 +52,34 @@ public class MainActivity extends AppCompatActivity {
         blueBoxFragment = new blue_order();
         countdownDisplay = findViewById(R.id.countdownDisplay);
         circularProgressBar = findViewById(R.id.circularProgressBar);
+        recyclerView = findViewById(R.id.recyclerView);
+        numberofRecord = findViewById(R.id.numberofRecord);
 
+        dbHelper = new OrderDbHelper(this);
 
         startCountdown();
+
+        ImageButton nextPageButton = findViewById(R.id.NextPage);
+        nextPageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentPage++;
+                fetchAndDisplayOrders();
+            }
+        });
+
+        ImageButton prevPageButton = findViewById(R.id.PreviousPage);
+        prevPageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentPage > 0 ) {
+                    currentPage--;
+                    fetchAndDisplayOrders();
+                }
+            }
+        });
+
+        fetchAndDisplayOrders(); // Fetch and display initial orders
 
         showRedButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,6 +102,24 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+    }
+    private void fetchAndDisplayOrders() {
+
+        numberofRecord.setText(String.valueOf(currentPage+1));
+
+        // Fetch orders based on the current page index
+        List<Order> orders = dbHelper.getOrdersByPage(currentPage * RECORDS_PER_PAGE, RECORDS_PER_PAGE);
+
+        // Update RecyclerView or any view to display the fetched orders
+
+        orderAdapter = new OrderAdapter(this, orders);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(orderAdapter);
+        // Disable/enable next button based on the number of records fetched
+        ImageButton nextPageButton = findViewById(R.id.NextPage);
+        nextPageButton.setEnabled(orders.size() >= RECORDS_PER_PAGE);
     }
 
     private void startCountdown() {
@@ -185,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
 
         super.onBackPressed();
     }
+
 
 }
 

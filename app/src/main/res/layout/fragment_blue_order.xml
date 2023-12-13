@@ -68,12 +68,13 @@
                     android:textSize="21dp" />
 
                 <TextView
-                    android:id="@+id/blue_select_1000"
+                    android:id="@+id/blue_select_500"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="8dp"
-                    android:text="1000"
+                    android:text="500"
                     android:textSize="21dp" />
+
 
             </LinearLayout>
 

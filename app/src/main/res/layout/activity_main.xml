@@ -126,7 +126,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Period"
+            android:text="Token"
             android:gravity="center"
             android:textSize="16sp" />
 
@@ -134,7 +134,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Token"
+            android:text="Value"
             android:gravity="center"
             android:textSize="16sp" />
 
@@ -165,6 +165,7 @@
         android:layout_above="@id/pageManager"
         android:layout_marginTop="8dp" />
     <!-- Pagination Controls -->
+
     <LinearLayout
         android:id="@+id/pageManager"
         android:layout_width="match_parent"
@@ -174,35 +175,31 @@
         android:layout_margin="8dp"
         android:gravity="center">
 
-        <TextView
-            android:id="@+id/numberofPageShown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1-10 of 255"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/totalPageNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="255"
-            android:textSize="16sp" />
-
         <ImageButton
+            android:id="@+id/PreviousPage"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/baseline_keyboard_arrow_left_24"
             android:contentDescription="Previous"
             android:background="@color/white"
-            android:layout_marginStart="16dp" />
+            android:layout_marginEnd="12dp" />
+
+        <TextView
+            android:id="@+id/numberofRecord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textSize="16sp" />
+
 
         <ImageButton
+            android:id="@+id/NextPage"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/baseline_navigate_next_24"
             android:contentDescription="Next"
             android:background="@color/white"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="12dp" />
 
     </LinearLayout>
 

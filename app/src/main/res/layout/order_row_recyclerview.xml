@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:id="@+id/row_layout"
     >
 
     <LinearLayout
@@ -12,22 +13,25 @@
         android:padding="8dp"
         android:layout_marginHorizontal="5dp">
         <TextView
+            android:id="@+id/textvalue_Token"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Period"
-            android:gravity="center"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="1.2"
             android:text="Token"
             android:gravity="center"
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/textvalue_Value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Value"
+            android:gravity="center"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textvalue_Color"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -36,6 +40,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/textvalue_Result"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
