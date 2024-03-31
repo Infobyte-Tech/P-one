@@ -52,7 +52,7 @@
                 android:layout_marginLeft="11dp"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:text="0000"
+                android:text="1000"
                 android:textColor="#FFFFFF"
                 android:textSize="21sp" />
 
@@ -67,6 +67,7 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/recharge_butt"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
