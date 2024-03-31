@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -22,6 +23,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CODE_RECHARGE = 1;
     private Button showRedButton;
     private Button showBlueButton;
     private FrameLayout fragmentContainer;
@@ -58,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
         dbHelper = new OrderDbHelper(this);
 
         startCountdown();
+
+        // Retrieve the balance from SharedPreferences and update the UI
+        updateBalance();
 
         ImageButton nextPageButton = findViewById(R.id.NextPage);
         nextPageButton.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +110,25 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    // Update the balance TextView with the current balance from SharedPreferences
+    private void updateBalance() {
+        SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        float balance = preferences.getFloat("balance", 0.0f);
+        TextView balanceTextView = findViewById(R.id.AvailableBalanceText);
+        balanceTextView.setText(String.valueOf(balance));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_RECHARGE && resultCode == RESULT_OK) {
+            // If the result is from Recharge activity and is successful,
+            // update the balance and UI
+            updateBalance();
+        }
+    }
+
     private void fetchAndDisplayOrders() {
 
         numberofRecord.setText(String.valueOf(currentPage+1));
