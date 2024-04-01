@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private int currentPage = 0; // Current page index
     private static final int RECORDS_PER_PAGE = 10;
 
+    private Button rechargeButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,10 @@ public class MainActivity extends AppCompatActivity {
         circularProgressBar = findViewById(R.id.circularProgressBar);
         recyclerView = findViewById(R.id.recyclerView);
         numberofRecord = findViewById(R.id.numberofRecord);
+        rechargeButton = findViewById(R.id.rechargebutton);
+        TextView availableBalanceText = findViewById(R.id.AvailableBalanceText);
+
+
 
         dbHelper = new OrderDbHelper(this);
 
@@ -97,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
         showBlueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,6 +115,22 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        rechargeButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                String availableBalance = availableBalanceText.getText().toString();
+                // Creating a new Intent
+                Intent intent = new Intent(MainActivity.this, Recharge.class);
+                // Putting the data we want to pass
+                intent.putExtra("AVAILABLE_BALANCE", availableBalance);
+                // Start the new activity
+                startActivityForResult(intent, REQUEST_CODE_RECHARGE);
+            }
+        });
+
+
 
 
     }
