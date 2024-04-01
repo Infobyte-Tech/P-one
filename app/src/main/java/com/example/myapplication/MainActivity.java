@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_RECHARGE = 1;
     private Button showRedButton;
     private Button showBlueButton;
+    private Button recharegeButton;
     private FrameLayout fragmentContainer;
     private red_order redBoxFragment;
     private blue_order blueBoxFragment;
@@ -60,12 +61,10 @@ public class MainActivity extends AppCompatActivity {
         numberofRecord = findViewById(R.id.numberofRecord);
         rechargeButton = findViewById(R.id.rechargebutton);
         TextView availableBalanceText = findViewById(R.id.AvailableBalanceText);
-
-
-
         dbHelper = new OrderDbHelper(this);
 
         startCountdown();
+
 
         // Retrieve the balance from SharedPreferences and update the UI
         updateBalance();
@@ -116,10 +115,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        rechargeButton.setOnClickListener(new View.OnClickListener() {
+        recharegeButton.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View view) {
+
+
                 String availableBalance = availableBalanceText.getText().toString();
                 // Creating a new Intent
                 Intent intent = new Intent(MainActivity.this, Recharge.class);
@@ -129,8 +130,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_CODE_RECHARGE);
             }
         });
-
-
 
 
     }
@@ -152,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
             updateBalance();
         }
     }
+
 
     private void fetchAndDisplayOrders() {
 
