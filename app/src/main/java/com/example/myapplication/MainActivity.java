@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_RECHARGE = 1;
     private Button showRedButton;
     private Button showBlueButton;
+    private Button recharegeButton;
     private FrameLayout fragmentContainer;
     private red_order redBoxFragment;
     private blue_order blueBoxFragment;
@@ -41,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
     private int currentPage = 0; // Current page index
     private static final int RECORDS_PER_PAGE = 10;
 
-    private Button rechargeButton;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         showRedButton = findViewById(R.id.showRedButton);
         showBlueButton = findViewById(R.id.showBlueButton);
+        recharegeButton = findViewById(R.id.recharge_butt);
         fragmentContainer = findViewById(R.id.fragmentContainer);
         redBoxFragment = new red_order();
         blueBoxFragment = new blue_order();
@@ -58,14 +58,19 @@ public class MainActivity extends AppCompatActivity {
         circularProgressBar = findViewById(R.id.circularProgressBar);
         recyclerView = findViewById(R.id.recyclerView);
         numberofRecord = findViewById(R.id.numberofRecord);
-        rechargeButton = findViewById(R.id.rechargebutton);
         TextView availableBalanceText = findViewById(R.id.AvailableBalanceText);
-
 
 
         dbHelper = new OrderDbHelper(this);
 
         startCountdown();
+
+//        // Retrieve the balance from SharedPreferences
+//        SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+//        float balance = preferences.getFloat("balance", 0.0f);
+//
+//        // Update the balance TextView in the main activity
+//        availableBalanceText.setText(String.valueOf(balance));
 
         // Retrieve the balance from SharedPreferences and update the UI
         updateBalance();
@@ -103,8 +108,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
         showBlueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,10 +119,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        rechargeButton.setOnClickListener(new View.OnClickListener() {
+        recharegeButton.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View view) {
+
                 String availableBalance = availableBalanceText.getText().toString();
                 // Creating a new Intent
                 Intent intent = new Intent(MainActivity.this, Recharge.class);
@@ -129,8 +133,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_CODE_RECHARGE);
             }
         });
-
-
 
 
     }
@@ -152,6 +154,9 @@ public class MainActivity extends AppCompatActivity {
             updateBalance();
         }
     }
+
+
+
 
     private void fetchAndDisplayOrders() {
 
@@ -290,4 +295,5 @@ public class MainActivity extends AppCompatActivity {
 
 
 }
+
 
