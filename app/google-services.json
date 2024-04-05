@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "273926251422",
+    "project_id": "infobytesapp-22053",
+    "storage_bucket": "infobytesapp-22053.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:273926251422:android:83b34258c4e1cb98616c8f",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZPhAZO-vAa5smwZibbvCivGe6I6ZGRCg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
