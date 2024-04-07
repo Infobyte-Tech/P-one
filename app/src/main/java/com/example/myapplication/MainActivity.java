@@ -1,47 +1,22 @@
 package com.example.myapplication;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import com.google.firebase.FirebaseApp;
+
+import kotlinx.coroutines.Dispatchers;
+import kotlinx.coroutines.GlobalScope;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int REQUEST_CODE_RECHARGE = 1;
-    private Button showRedButton;
-    private Button showBlueButton;
-    private Button recharegeButton;
-    private FrameLayout fragmentContainer;
-    private red_order redBoxFragment;
-    private blue_order blueBoxFragment;
-    private boolean isRedFragmentOpened = false;
-    private boolean isBlueFragmentOpened = false;
-    private TextView countdownDisplay;
-    private TextView numberofRecord;
-    private CountDownTimer countDownTimer;
-    private ProgressBar circularProgressBar;
-    private RecyclerView recyclerView;
-    private OrderAdapter orderAdapter;
-    private OrderDbHelper dbHelper;
-    private int currentPage = 0; // Current page index
-    private static final int RECORDS_PER_PAGE = 10;
 
+    private SharedPreferences.Editor editor;
+    private String res;
     private Button rechargeButton;
 
 
@@ -49,6 +24,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        FirebaseApp.initializeApp(this);
+        SharedPreferences sharedpref = getSharedPreferences("MYAPP", MODE_PRIVATE);
+        editor = sharedpref.edit();
+        new Handler().postDelayed(() -> {
+            try {
+                String ifloggedin = sharedpref.getString("isloggedin", "");
+                if ("true".equals(ifloggedin)) {
+                    Intent intu = new Intent(MainActivity.this, HomeScreen.class);
+                    startActivity(intu);
+                    finish();
+                } else {
+                    Intent intu = new Intent(MainActivity.this, LoginScreen.class);
+                    startActivity(intu);
+                    finish();
+                }
+            } catch (Exception e) {
+              Intent intu = new Intent(MainActivity.this, LoginScreen.class);
+                startActivity(intu);
+                finish();
+            }
+            finish();
+        }, 100);
+    }
 
         showRedButton = findViewById(R.id.showRedButton);
         showBlueButton = findViewById(R.id.showBlueButton);
@@ -214,81 +213,8 @@ public class MainActivity extends AppCompatActivity {
                 // Restart the activity
                 Intent intent = getIntent();
                 finish();
-                startActivity(intent);
             }
-        }, 3000); // Delay of 3 seconds to show the progress bar (adjust as needed)
+            finish();
+        }, 100);
     }
-
-
-    private void showRedOrderFragment() {
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragmentContainer, redBoxFragment)
-                .commit();
-        redBoxFragment.setOnFragmentCloseListener(new red_order.OnFragmentCloseListener() {
-            @Override
-            public void onClose() {
-                isRedFragmentOpened = false;
-                enableHomeScreen();
-            }
-        });
-    }
-
-    private void showBlueOrderFragment() {
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragmentContainer, blueBoxFragment)
-                .commit();
-        blueBoxFragment.setOnFragmentCloseListener(new blue_order.OnFragmentCloseListener() {
-            @Override
-            public void onClose() {
-                isBlueFragmentOpened = false;
-                enableHomeScreen();
-            }
-        });
-    }
-
-    private void disableHomeScreen() {
-        showRedButton.setEnabled(false);
-        showBlueButton.setEnabled(false);
-        findViewById(android.R.id.content).setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true; // Consume touch events
-            }
-        });
-    }
-
-    private void enableHomeScreen() {
-        showRedButton.setEnabled(true);
-        showBlueButton.setEnabled(true);
-        findViewById(android.R.id.content).setOnTouchListener(null);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (isRedFragmentOpened) {
-            red_order redFragment = (red_order) getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
-            if (redFragment != null && redFragment.isVisible()) {
-                redFragment.closeFragment();
-                enableHomeScreen();
-                isRedFragmentOpened = false;
-                return;
-            }
-        }
-
-        if (isBlueFragmentOpened) {
-            blue_order blueFragment = (blue_order) getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
-            if (blueFragment != null && blueFragment.isVisible()) {
-                blueFragment.closeFragment();
-                enableHomeScreen();
-                isBlueFragmentOpened = false;
-                return;
-            }
-        }
-
-        super.onBackPressed();
-    }
-
-
 }
-
-

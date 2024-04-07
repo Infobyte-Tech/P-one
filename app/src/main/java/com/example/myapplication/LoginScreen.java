@@ -1,97 +1,121 @@
 package com.example.myapplication;
+import static android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.FirebaseApp;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class LoginScreen extends AppCompatActivity {
 
-
-    private EditText usernameEditText;
     private EditText passwordEditText;
-    private Button loginButton, signupButton;
-    private TextInputLayout usernameTextInputLayout, passwordTextInputLayout;
-    private TextView forgetPasswordTextView;
+    private ImageButton showHideButton;
 
+    private Integer inputtype;
+
+    private TextView createnewaccount;
+    private boolean isPasswordVisible = false;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
 
-        // Initialize views
-        loginButton = findViewById(R.id.loginButton);
-        signupButton = findViewById(R.id.signupButton);
-        usernameTextInputLayout = findViewById(R.id.usernameTextInputLayout);
-        passwordTextInputLayout = findViewById(R.id.passwordTextInputLayout);
-        usernameEditText = findViewById(R.id.usernameEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
-        usernameTextInputLayout = findViewById(R.id.usernameTextInputLayout);
-        passwordTextInputLayout = findViewById(R.id.passwordTextInputLayout);
-        forgetPasswordTextView = findViewById(R.id.forgotPasswordTextView);
-
-        // Set click listener for the login button
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        showHideButton = findViewById(R.id.imageButton2);
+        createnewaccount = findViewById(R.id.CreateNewAccount);
+        showHideButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = usernameEditText.getText().toString().trim();
+                isPasswordVisible = !isPasswordVisible;
+                updatePasswordVisibility();
+            }
+        });
+        createnewaccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginScreen.this , Createnewaccount.class);
+                startActivity(intent);
+            }
+        });
+
+        FirebaseApp.initializeApp(this);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        ProgressBar progbut = findViewById(R.id.progressbar);
+        EditText emailadr = findViewById(R.id.usernameEditText);
+        Button loginbut = findViewById(R.id.loginButton);
+        TextInputLayout username = findViewById(R.id.usernameTextInputLayout);
+        TextInputLayout passwordInputLayout = findViewById(R.id.passwordTextInputLayout);
+        loginbut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginbut.setText("");
+                progbut.setVisibility(View.VISIBLE);
+
+                String email = emailadr.getText().toString().trim();
                 String password = passwordEditText.getText().toString().trim();
 
-                // Validate username and password fields
-                boolean isValid = true;
-
-                if (username.isEmpty()) {
-                    // Set an error in the username TextInputLayout
-                    usernameTextInputLayout.setError("Username is required");
-                    isValid = false;
+                if (email.isEmpty() || password.isEmpty()) {
+                    progbut.setVisibility(View.GONE);
+                    loginbut.setText("Login");
+                    if (email.equals("")) {
+                        username.setError("Email id cannot be empty!");
+                    } else {
+                        passwordInputLayout.setError("Password cannot be empty!");
+                    }
                 } else {
-                    // Clear the error if the field is not empty
-                    usernameTextInputLayout.setError(null);
+                    username.setError(null);
+                    passwordInputLayout.setError(null);
+                    auth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(LoginScreen.this, task -> {
+                                if (task.isSuccessful()) {
+                                    SharedPreferences sharedpref = getSharedPreferences("MYAPP", MODE_PRIVATE);
+                                    editor = sharedpref.edit();
+                                    editor.putString("isloggedin", "true");
+                                    editor.apply();
+                                    Intent intentti = new Intent(LoginScreen.this, HomeScreen.class);
+                                    startActivity(intentti);
+                                    finish();
+                                } else {
+                                    progbut.setVisibility(View.GONE);
+                                    loginbut.setText("Login");
+                                    Toast.makeText(LoginScreen.this, "Invalid Login Credentials", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                 }
-
-                if (password.isEmpty()) {
-                    // Set an error in the password TextInputLayout
-                    passwordTextInputLayout.setError("Password is required");
-                    isValid = false;
-                } else {
-                    // Clear the error if the field is not empty
-                    passwordTextInputLayout.setError(null);
-                }
-
-                // If both fields are not empty, proceed to the HomeScreen
-                if (isValid) {
-                    Intent intent = new Intent(LoginScreen.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-        });
-
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate to SignupActivity
-                startActivity(new Intent(LoginScreen.this, SignupScreen.class));
-            }
-        });
-
-        forgetPasswordTextView.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v)
-            {
-                //forgett pass Logic
             }
         });
     }
-    @Override
-    public void onBackPressed() {
-        // Exit the application when the back button is pressed on the login screen
-        finishAffinity(); // Finish this activity and all parent activities
+
+    private void updatePasswordVisibility() {
+        if(isPasswordVisible){
+            showHideButton.setBackgroundResource(R.drawable.ic_eye_outline_24);
+            inputtype = InputType.TYPE_CLASS_TEXT;
+        }
+        else{
+            showHideButton.setBackgroundResource(R.drawable.ic_eye_off_outline_24);
+            inputtype = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+        }
+        passwordEditText.setInputType(inputtype);
+        // Move cursor to the end of the text
+        passwordEditText.setSelection(passwordEditText.getText().length());
     }
 }
