@@ -67,11 +67,7 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatButton
-<<<<<<< HEAD
                 android:id="@+id/rechargebutton"
-=======
-                android:id="@+id/recharge_butt"
->>>>>>> 00c0a92 (Integrated Payment Gateway)
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
