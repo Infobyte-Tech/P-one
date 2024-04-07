@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -22,8 +23,10 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CODE_RECHARGE = 1;
     private Button showRedButton;
     private Button showBlueButton;
+    private Button recharegeButton;
     private FrameLayout fragmentContainer;
     private red_order redBoxFragment;
     private blue_order blueBoxFragment;
@@ -38,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private OrderDbHelper dbHelper;
     private int currentPage = 0; // Current page index
     private static final int RECORDS_PER_PAGE = 10;
+
+    private Button rechargeButton;
 
 
     @Override
@@ -54,10 +59,15 @@ public class MainActivity extends AppCompatActivity {
         circularProgressBar = findViewById(R.id.circularProgressBar);
         recyclerView = findViewById(R.id.recyclerView);
         numberofRecord = findViewById(R.id.numberofRecord);
-
+        rechargeButton = findViewById(R.id.rechargebutton);
+        TextView availableBalanceText = findViewById(R.id.AvailableBalanceText);
         dbHelper = new OrderDbHelper(this);
 
         startCountdown();
+
+
+        // Retrieve the balance from SharedPreferences and update the UI
+        updateBalance();
 
         ImageButton nextPageButton = findViewById(R.id.NextPage);
         nextPageButton.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
         showBlueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,8 +115,44 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        recharegeButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+
+
+                String availableBalance = availableBalanceText.getText().toString();
+                // Creating a new Intent
+                Intent intent = new Intent(MainActivity.this, Recharge.class);
+                // Putting the data we want to pass
+                intent.putExtra("AVAILABLE_BALANCE", availableBalance);
+                // Start the new activity
+                startActivityForResult(intent, REQUEST_CODE_RECHARGE);
+            }
+        });
+
 
     }
+
+    // Update the balance TextView with the current balance from SharedPreferences
+    private void updateBalance() {
+        SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        float balance = preferences.getFloat("balance", 0.0f);
+        TextView balanceTextView = findViewById(R.id.AvailableBalanceText);
+        balanceTextView.setText(String.valueOf(balance));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_RECHARGE && resultCode == RESULT_OK) {
+            // If the result is from Recharge activity and is successful,
+            // update the balance and UI
+            updateBalance();
+        }
+    }
+
+
     private void fetchAndDisplayOrders() {
 
         numberofRecord.setText(String.valueOf(currentPage+1));
