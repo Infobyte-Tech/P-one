@@ -91,7 +91,7 @@ public class LoginScreen extends AppCompatActivity {
                                     editor = sharedpref.edit();
                                     editor.putString("isloggedin", "true");
                                     editor.apply();
-                                    Intent intentti = new Intent(LoginScreen.this, HomeScreen.class);
+                                    Intent intentti = new Intent(LoginScreen.this, MainActivity.class);
                                     startActivity(intentti);
                                     finish();
                                 } else {

@@ -100,6 +100,7 @@ public class Createnewaccount extends AppCompatActivity {
             startEmailauth.putExtra("phonenumber" , phone);
             startEmailauth.putExtra("name" , name);
             startEmailauth.putExtra("password" , password);
+            startEmailauth.putExtra("Balance", 0);
             startActivity(startEmailauth);
         }
     }

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -17,16 +18,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int REQUEST_CODE_RECHARGE = 1;
     private Button showRedButton;
     private Button showBlueButton;
-    private Button recharegeButton;
+    private Button rechargeButton;
+    private TextView availableBalanceText;
     private FrameLayout fragmentContainer;
     private red_order redBoxFragment;
     private blue_order blueBoxFragment;
@@ -50,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         showRedButton = findViewById(R.id.showRedButton);
         showBlueButton = findViewById(R.id.showBlueButton);
-        recharegeButton = findViewById(R.id.recharge_butt);
+        rechargeButton = findViewById(R.id.rechargebutton);
         fragmentContainer = findViewById(R.id.fragmentContainer);
         redBoxFragment = new red_order();
         blueBoxFragment = new blue_order();
@@ -58,12 +66,15 @@ public class MainActivity extends AppCompatActivity {
         circularProgressBar = findViewById(R.id.circularProgressBar);
         recyclerView = findViewById(R.id.recyclerView);
         numberofRecord = findViewById(R.id.numberofRecord);
-        TextView availableBalanceText = findViewById(R.id.AvailableBalanceText);
+        availableBalanceText = findViewById(R.id.AvailableBalanceText);
 
 
         dbHelper = new OrderDbHelper(this);
 
         startCountdown();
+
+        // Retrieve user's balance from Firebase
+        retrieveUserBalance();
 
 //        // Retrieve the balance from SharedPreferences
 //        SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
@@ -73,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 //        availableBalanceText.setText(String.valueOf(balance));
 
         // Retrieve the balance from SharedPreferences and update the UI
-        updateBalance();
+        //updateBalance();
 
         ImageButton nextPageButton = findViewById(R.id.NextPage);
         nextPageButton.setOnClickListener(new View.OnClickListener() {
@@ -119,42 +130,56 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        recharegeButton.setOnClickListener(new View.OnClickListener(){
 
+
+        rechargeButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-
+            public void onClick(View v) {
                 String availableBalance = availableBalanceText.getText().toString();
+                Log.d("RechargeButton", "Available Balance: " + availableBalance);
+
                 // Creating a new Intent
                 Intent intent = new Intent(MainActivity.this, Recharge.class);
                 // Putting the data we want to pass
                 intent.putExtra("AVAILABLE_BALANCE", availableBalance);
                 // Start the new activity
-                startActivityForResult(intent, REQUEST_CODE_RECHARGE);
+                startActivity(intent);
             }
         });
 
 
+
     }
 
-    // Update the balance TextView with the current balance from SharedPreferences
-    private void updateBalance() {
-        SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        float balance = preferences.getFloat("balance", 0.0f);
-        TextView balanceTextView = findViewById(R.id.AvailableBalanceText);
-        balanceTextView.setText(String.valueOf(balance));
+    private void retrieveUserBalance() {
+        // Get current user's ID
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Firebase Database reference to the user's balance
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(userId).child("balance");
+
+        // Listen for changes in the user's balance
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Integer balance = dataSnapshot.getValue(Integer.class); // Retrieve balance as Integer
+                    if (balance != null) {
+                        updateBalanceUI(balance); // Update UI with the fetched balance
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("MainActivity", "Failed to read user balance.", databaseError.toException());
+            }
+        });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_RECHARGE && resultCode == RESULT_OK) {
-            // If the result is from Recharge activity and is successful,
-            // update the balance and UI
-            updateBalance();
-        }
+    private void updateBalanceUI(int balance) {
+        availableBalanceText.setText(String.valueOf(balance)); // Update the TextView with the fetched balance
     }
-
 
 
 

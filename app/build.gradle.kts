@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 
@@ -45,5 +46,12 @@ dependencies {
 
     //razorpay
     implementation ("com.razorpay:checkout:1.6.33")
+
+    //firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation("com.google.firebase:firebase-database:20.3.1")
+    implementation("com.google.firebase:firebase-firestore:24.11.0")
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
+
 
 }

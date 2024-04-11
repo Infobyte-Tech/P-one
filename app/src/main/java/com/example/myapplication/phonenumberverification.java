@@ -44,7 +44,7 @@ public class phonenumberverification extends AppCompatActivity {
     DatabaseReference usersRef;
     PhoneAuthProvider.ForceResendingToken token;
     String verificationId;
-    String  phone , emaild , password , phonenumber , name;
+    String  phone , email , password , phonenumber , name, balance;
     PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
 
@@ -54,9 +54,10 @@ public class phonenumberverification extends AppCompatActivity {
         setContentView(R.layout.activity_phonenumberverification);
         TextView tv = findViewById(R.id.photp);
         phone = getIntent().getStringExtra("phonenumber");
-        emaild = getIntent().getStringExtra("email");
+        email = getIntent().getStringExtra("email");
         name = getIntent().getStringExtra("name");
         password = getIntent().getStringExtra("password");
+        balance = getIntent().getStringExtra("balance");
         String newPhone = hidePhone(String.valueOf(phone));
         phone = "+91 "+phone;
         tv.setText(tv.getText() + " " + newPhone);
@@ -82,9 +83,11 @@ public class phonenumberverification extends AppCompatActivity {
         verifyPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                signUpWithEmailAndPassword(emaild , password);
-                Intent intentti = new Intent(phonenumberverification.this, HomeScreen.class);
+                signUpWithEmailAndPassword(email , password);
+                Intent intentti = new Intent(phonenumberverification.this, MainActivity.class);
                 startActivity(intentti);
+
+                validateOTPAndVerify();
 
                 /*validateField(otpNumberOne);
                 validateField(getOtpNumberTwo);
@@ -145,6 +148,46 @@ public class phonenumberverification extends AppCompatActivity {
         });
 
     }
+
+    private void validateOTPAndVerify() {
+        String otp = otpNumberOne.getText().toString() +
+                getOtpNumberTwo.getText().toString() +
+                getOtpNumberThree.getText().toString() +
+                getOtpNumberFour.getText().toString() +
+                getOtpNumberFive.getText().toString() +
+                otpNumberSix.getText().toString();
+
+        if (otp.length() == 6 && verificationId != null) {
+            PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, otp);
+            verifyAuthentication(credential);
+        } else {
+            Toast.makeText(this, "Please enter valid OTP", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void verifyAuthentication(PhoneAuthCredential credential) {
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                            if (user != null) {
+                                storeUserDetailsInDatabase(user.getUid(), email);
+                                // Sign up the user with email and password in Firebase Authentication
+                                signUpWithEmailAndPassword(email, password);
+                            } else {
+                                Toast.makeText(phonenumberverification.this, "User is null", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(phonenumberverification.this, "Authentication failed: " + task.getException(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+
+
     public void signUpWithEmailAndPassword(String email, String password) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -164,6 +207,7 @@ public class phonenumberverification extends AppCompatActivity {
     }
 
 
+
     // Function to store user details in Realtime Database
     public void storeUserDetailsInDatabase(String userId, String email) {
         HashMap<String, Object> user = new HashMap<>();
@@ -171,11 +215,13 @@ public class phonenumberverification extends AppCompatActivity {
         user.put("password" , password);
         user.put("phonenumber" , phone);
         user.put("name" , name);
+        user.put("balance", 0);
         if (userId != null) {
             usersRef.child(userId).setValue(user)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+
                             // User details stored successfully
                             Toast.makeText(phonenumberverification.this, "User details stored in database", Toast.LENGTH_SHORT).show();
                         }
@@ -209,9 +255,9 @@ public class phonenumberverification extends AppCompatActivity {
         }
     }
 
-    public void verifyAuthentication(PhoneAuthCredential credential){
-        Toast.makeText(phonenumberverification.this, "Acccount Created and Linked.", Toast.LENGTH_SHORT).show();
-    }
+//    public void verifyAuthentication(PhoneAuthCredential credential){
+//        Toast.makeText(phonenumberverification.this, "Acccount Created and Linked.", Toast.LENGTH_SHORT).show();
+//    }
     private void setupEditTextListeners() {
         for (int i = 0; i < editTexts.size(); i++) {
             final int index = i;
